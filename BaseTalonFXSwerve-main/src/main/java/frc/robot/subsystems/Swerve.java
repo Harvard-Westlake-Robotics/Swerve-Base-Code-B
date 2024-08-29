@@ -21,6 +21,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Swerve extends SubsystemBase {
     public SwerveDriveOdometry swerveOdometry;
     public SwerveModule[] mSwerveMods;
+    public SwerveModule[] getmSwerveMods() {
+        return mSwerveMods;
+    }
+
     public Pigeon2 gyro;
 
     public Swerve() {
@@ -68,6 +72,11 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    public void stop()
+    {
+        setVelocity(0);
+    }
+
     public SwerveModuleState[] getModuleStates(){
         SwerveModuleState[] states = new SwerveModuleState[4];
         for(SwerveModule mod : mSwerveMods){
@@ -82,6 +91,21 @@ public class Swerve extends SubsystemBase {
             positions[mod.moduleNumber] = mod.getPosition();
         }
         return positions;
+    }
+
+    public void setVelocity(double value)
+    {
+        SwerveModuleState[] states = new SwerveModuleState[getModuleCount()];
+        for(int i = 0; i < states.length; i++)
+        {
+            states[i] = new SwerveModuleState(value, new Rotation2d());
+        }
+        setModuleStates(states);
+    }
+
+    public int getModuleCount()
+    {
+        return mSwerveMods.length;
     }
 
     public Pose2d getPose() {
@@ -112,6 +136,14 @@ public class Swerve extends SubsystemBase {
         for(SwerveModule mod : mSwerveMods){
             mod.resetToAbsolute();
         }
+    }
+
+    public double getMeasurement(){
+        double sum = 0;
+        for(SwerveModule mod : mSwerveMods){
+            sum += mod.getState().speedMetersPerSecond;
+        }
+        return sum / mSwerveMods.length;
     }
 
     @Override
