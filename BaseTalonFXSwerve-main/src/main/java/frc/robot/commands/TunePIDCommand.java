@@ -3,21 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-
-interface Get<I,O>
-{
-    O get(I input);
-}
-
-interface MonoFunc<T>
-{
-    void run(T input);
-}
-
-interface DiFunc<T,L>
-{
-    void run(T input1, L input2);
-}
+import frc.robot.util.*;
 
 public class TunePIDCommand<T extends Subsystem> extends SequentialCommandGroup {
     private final PIDController pidController;
