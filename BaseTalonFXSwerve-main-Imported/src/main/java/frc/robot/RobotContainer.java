@@ -1,13 +1,17 @@
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 
@@ -22,17 +26,12 @@ import frc.robot.subsystems.*;
  */
 public class RobotContainer {
     /* Controllers */
-    private final Joystick driver = new Joystick(0);
-
-    /* Drive Controls */
-    private final int translationAxis = XboxController.Axis.kLeftY.value;
-    private final int strafeAxis = XboxController.Axis.kLeftX.value;
-    private final int rotationAxis = XboxController.Axis.kRightX.value;
-
+    private final PS4Controller driver = new PS4Controller(0);
     /* Driver Buttons */
     private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton robotCentric = new JoystickButton(driver,
             XboxController.Button.kLeftBumper.value);
+    private final JoystickButton isDrifting = new JoystickButton(driver, PS4Controller.Button.kL1.value);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -48,7 +47,17 @@ public class RobotContainer {
         // () -> -driver.getRawAxis(strafeAxis),
         // () -> -driver.getRawAxis(rotationAxis),
         // () -> robotCentric.getAsBoolean()));
-        s_Swerve.setDefaultCommand(new TuneSwervePIDCommand(s_Swerve));
+        s_Swerve.setDefaultCommand(new TeleopSwerve(
+                s_Swerve,
+                () -> -driver.getLeftY(),
+                () -> -driver.getLeftX(),
+                () -> -driver.getRightX(), robotCentric));
+
+        AutoBuilder.configureHolonomic(s_Swerve::getPose,
+                s_Swerve::setPose,
+                s_Swerve::getRobotVelocity,
+                s_Swerve::fromChassisSpeeds, Constants.AutoConstants.getPathFollowerConfig(), RobotContainer::getIsRed,
+                s_Swerve);
 
         // Configure the button bindings
         configureButtonBindings();
@@ -65,6 +74,16 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
+        // isDrifting.onTrue(new InstantCommand((() -> s_Swerve.isDrifting =
+        // !s_Swerve.isDrifting)));
+    }
+
+    public static boolean getIsRed() {
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+        }
+        return false;
     }
 
     /**
@@ -74,6 +93,6 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An ExampleCommand will run in autonomous
-        return new exampleAuto(s_Swerve);
+        return new PathPlannerAuto("Splean Time");
     }
 }
