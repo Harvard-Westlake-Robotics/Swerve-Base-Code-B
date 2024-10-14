@@ -2,7 +2,8 @@ package frc.robot.subsystems;
 
 import frc.robot.SwerveModule;
 import frc.robot.Constants;
-
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -10,17 +11,30 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
+    private static Swerve instance;
     public SwerveDriveOdometry swerveOdometry;
     public SwerveModule[] mSwerveMods;
+    private NeutralModeValue neutralMode = Constants.Swerve.driveNeutralMode;
+    private SendableChooser<NeutralModeValue> neutralModeChooser = new SendableChooser<>();
+
+    public NeutralModeValue getNeutralMode() {
+        return neutralMode;
+    }
+
+    public void setNeutralMode(NeutralModeValue neutralMode) {
+        this.neutralMode = neutralMode;
+    }
 
     public SwerveModule[] getmSwerveMods() {
         return mSwerveMods;
@@ -28,7 +42,14 @@ public class Swerve extends SubsystemBase {
 
     public Pigeon2 gyro;
 
-    public Swerve() {
+    public static Swerve getInstance() {
+        if (instance == null) {
+            instance = new Swerve();
+        }
+        return instance;
+    }
+
+    private Swerve() {
         gyro = new Pigeon2(Constants.Swerve.pigeonID);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);
@@ -40,6 +61,9 @@ public class Swerve extends SubsystemBase {
         };
 
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions());
+
+        neutralModeChooser.setDefaultOption("Brake", NeutralModeValue.Brake);
+        neutralModeChooser.addOption("Coast", NeutralModeValue.Coast);
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -52,7 +76,21 @@ public class Swerve extends SubsystemBase {
                         : new ChassisSpeeds(
                                 translation.getX(),
                                 translation.getY(),
-                                rotation));
+                                rotation),
+                new Translation2d(0, Constants.Swerve.wheelBase / 2));
+        // Sets center of rotation to front of robot for sick drifts
+        if (RobotContainer.isDrifting()) {
+            swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(
+                    fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                            translation.getX(),
+                            translation.getY(),
+                            rotation,
+                            getHeading())
+                            : new ChassisSpeeds(
+                                    translation.getX(),
+                                    translation.getY(),
+                                    rotation));
+        }
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 
         for (SwerveModule mod : mSwerveMods) {
@@ -154,10 +192,20 @@ public class Swerve extends SubsystemBase {
     public void periodic() {
         swerveOdometry.update(getGyroYaw(), getModulePositions());
 
+        // Smart Dashboard numbers
         for (SwerveModule mod : mSwerveMods) {
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " CANcoder", mod.getCANcoder().getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
+        }
+        SmartDashboard.putNumber("Gyro Yaw", getGyroYaw().getDegrees());
+        SmartDashboard.putNumber("Robot Velocity", getRobotVelocity().vxMetersPerSecond);
+        SmartDashboard.putNumber("Robot Angular Velocity", getRobotVelocity().omegaRadiansPerSecond);
+        SmartDashboard.putData(neutralModeChooser);
+
+        // Allow operator to change neutral mode on the fly
+        if (neutralMode != neutralModeChooser.getSelected()) {
+            setNeutralMode(neutralModeChooser.getSelected());
         }
     }
 }

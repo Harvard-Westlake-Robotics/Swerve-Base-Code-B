@@ -169,6 +169,12 @@ public final class Constants {
                     angleMotorID,
                     canCoderID, angleOffset);
         }
+
+        public static final class Intake { // Intake
+            public static final int intakeMotorID = 9; // Intake motor ID
+            public static final int intakeSensorPort = 0; // Intake sensor ID
+            public static final boolean intakeMotorInverted = false; // Intake motor inverted
+        }
     }
 
     public static final class AutoConstants { // TODO: The below constants are used in the example auto, and must be

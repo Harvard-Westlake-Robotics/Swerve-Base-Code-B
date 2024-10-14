@@ -31,10 +31,14 @@ public class RobotContainer {
     private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton robotCentric = new JoystickButton(driver,
             XboxController.Button.kLeftBumper.value);
-    private final JoystickButton isDrifting = new JoystickButton(driver, PS4Controller.Button.kL1.value);
+    private static final boolean isDrifting = false;
+
+    public static boolean isDrifting() {
+        return isDrifting;
+    }
 
     /* Subsystems */
-    private final Swerve s_Swerve = new Swerve();
+    private final Swerve s_Swerve = Swerve.getInstance();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
