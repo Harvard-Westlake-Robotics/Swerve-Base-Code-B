@@ -24,6 +24,10 @@ public class Carriage extends SubsystemBase {
     boolean prepShot = false;
     boolean isFiring = false;
     boolean hasNote = true;
+    public boolean isHasNote() {
+        return hasNote;
+    }
+
     private SendableChooser<NeutralModeValue> neutralModeChooser = new SendableChooser<>();
     private double velocity = 0.0;
     private NeutralModeValue currentNeutralMode = Constants.Swerve.Carriage.carriageNeutralMode;

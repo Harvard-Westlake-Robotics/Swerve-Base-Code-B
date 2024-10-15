@@ -224,8 +224,8 @@ public final class Constants {
             public static final int fireMotor2ID = 9; // Fire motor 2 ID
             public static final boolean fireMotor2Inverted = false; // Fire motor 2 inverted
             public static final double anglekS = 0.0; // Angle kS
+            public static final double anglekG = 0.0; // Angle kG
             public static final double anglekV = 0.0; // Angle kV
-            public static final double anglekA = 0.0; // Angle kA
             public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Brake; // Angle neutral mode
             public static final double angleKP = 0.0; // Angle kP
             public static final double angleKI = 0.0; // Angle kI
@@ -246,6 +246,8 @@ public final class Constants {
 
             public static final double downAngle = 0.0; // Down angle
             public static final double upAngle = 100.0; // Up angle
+
+            public static final int angleSensorPort = 0; // Angle sensor port
         }
     }
 

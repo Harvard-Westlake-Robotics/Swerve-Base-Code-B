@@ -38,6 +38,7 @@ public class PoseEstimator extends SubsystemBase {
 
     @Override
     public void periodic() {
+        update();
         for (VisionMeasurement measurement : vision.getVisionMeasurements()) {
             poseEstimator.setVisionMeasurementStdDevs(measurement.stdDevs);
             poseEstimator.addVisionMeasurement(measurement.estimatedPose, measurement.timestamp);

@@ -40,10 +40,13 @@ public class Vision {
 
     /**
      * Returns a list of vision measurements from all cameras that can be used with
-     * a SwerveDrivePoseEstimator. Only includes measurements where AprilTags are detected.
-     * During autonomous, discards measurements where the closest tag is more than 0.4 meters away.
+     * a SwerveDrivePoseEstimator. Only includes measurements where AprilTags are
+     * detected.
+     * During autonomous, discards measurements where the closest tag is more than
+     * 0.4 meters away.
      *
-     * @return A list of VisionMeasurement instances containing estimated poses and standard deviations.
+     * @return A list of VisionMeasurement instances containing estimated poses and
+     *         standard deviations.
      */
     public List<VisionMeasurement> getVisionMeasurements() {
         List<VisionMeasurement> measurements = new ArrayList<>();
@@ -66,7 +69,8 @@ public class Vision {
                         double minDist = Double.MAX_VALUE;
                         for (var target : result.getTargets()) {
                             var tagPoseOptional = kTagLayout.getTagPose(target.getFiducialId());
-                            if (tagPoseOptional.isEmpty()) continue;
+                            if (tagPoseOptional.isEmpty())
+                                continue;
                             var tagPose = tagPoseOptional.get().toPose2d();
                             double distance = tagPose.getTranslation().getDistance(
                                     estimatedPose.estimatedPose.toPose2d().getTranslation());
@@ -90,10 +94,12 @@ public class Vision {
     }
 
     /**
-     * Calculates the standard deviations for an estimated pose based on the number of visible targets
-     * and their average distance. This helps in adjusting the confidence level of the measurements.
+     * Calculates the standard deviations for an estimated pose based on the number
+     * of visible targets
+     * and their average distance. This helps in adjusting the confidence level of
+     * the measurements.
      *
-     * @param result The latest pipeline result from the camera.
+     * @param result        The latest pipeline result from the camera.
      * @param estimatedPose The estimated robot pose.
      * @return A Matrix containing the standard deviations.
      */
@@ -105,7 +111,8 @@ public class Vision {
 
         for (var tgt : targets) {
             var tagPose = kTagLayout.getTagPose(tgt.getFiducialId());
-            if (tagPose.isEmpty()) continue;
+            if (tagPose.isEmpty())
+                continue;
             numTags++;
             avgDist += tagPose.get()
                     .toPose2d()
@@ -113,7 +120,8 @@ public class Vision {
                     .getDistance(estimatedPose.estimatedPose.toPose2d().getTranslation());
         }
 
-        if (numTags == 0) return estStdDevs;
+        if (numTags == 0)
+            return estStdDevs;
         avgDist /= numTags;
 
         // Adjust standard deviations based on the number of tags and average distance
@@ -130,7 +138,8 @@ public class Vision {
     }
 
     /**
-     * A helper class to hold the estimated robot pose and its associated standard deviations.
+     * A helper class to hold the estimated robot pose and its associated standard
+     * deviations.
      */
     public static class VisionMeasurement {
         public final Pose2d estimatedPose;
