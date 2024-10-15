@@ -28,6 +28,7 @@ public class Swerve extends SubsystemBase {
     private NeutralModeValue neutralMode = Constants.Swerve.driveNeutralMode;
     private SendableChooser<NeutralModeValue> neutralModeChooser = new SendableChooser<>();
 
+
     public NeutralModeValue getNeutralMode() {
         return neutralMode;
     }
@@ -50,7 +51,7 @@ public class Swerve extends SubsystemBase {
     }
 
     private Swerve() {
-        gyro = new Pigeon2(Constants.Swerve.pigeonID);
+        gyro = new Pigeon2(Constants.Swerve.pigeonID, "drive");
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);
         mSwerveMods = new SwerveModule[] {
@@ -76,21 +77,8 @@ public class Swerve extends SubsystemBase {
                         : new ChassisSpeeds(
                                 translation.getX(),
                                 translation.getY(),
-                                rotation),
-                new Translation2d(0, Constants.Swerve.wheelBase / 2));
+                                rotation));
         // Sets center of rotation to front of robot for sick drifts
-        if (RobotContainer.isDrifting()) {
-            swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(
-                    fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                            translation.getX(),
-                            translation.getY(),
-                            rotation,
-                            getHeading())
-                            : new ChassisSpeeds(
-                                    translation.getX(),
-                                    translation.getY(),
-                                    rotation));
-        }
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 
         for (SwerveModule mod : mSwerveMods) {

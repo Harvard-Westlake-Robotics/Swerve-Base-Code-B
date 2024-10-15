@@ -97,7 +97,7 @@ public final class Constants {
         public static final double angleKD = chosenModule.angleKD;
 
         /* Drive Motor PID Values */
-        public static final double driveKP = 0.120; // TODO: This must be tuned to specific robot
+        public static final double driveKP = 1.120; // TODO: This must be tuned to specific robot
         public static final double driveKI = 0.0;
         public static final double driveKD = 0.00;
         public static final double driveKF = 0.0;
@@ -120,12 +120,12 @@ public final class Constants {
         /* Module Specific Constants */
         /* Front Left Module - Module 0 */
         public static final class Mod0 { // Front Left Module
-            public static final int driveMotorID = 7; // Left Front Go motor ID
-            public static final int angleMotorID = 8; // Left Front Turn motor ID
-            public static final int canCoderID = 23; // Left Front Encoder CAN ID, assuming it acts as the
+            public static final int driveMotorID = 4; // Left Front Go motor ID
+            public static final int angleMotorID = 3; // Left Front Turn motor ID
+            public static final int canCoderID = 12; // Left Front Encoder CAN ID, assuming it acts as the
                                                      // canCoder for
                                                      // this module
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(3.24 - 180 - 90); // Adjusted to
+            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.458); // Adjusted to
             // match the
             // left
             // front encoder
@@ -136,12 +136,12 @@ public final class Constants {
         }
 
         public static final class Mod1 { // Front Right Module
-            public static final int driveMotorID = 1; // Right Front Go motor ID
-            public static final int angleMotorID = 2; // Right Front Turn motor ID
-            public static final int canCoderID = 20; // Right Front Encoder CAN ID, assuming it acts as the
+            public static final int driveMotorID = 6; // Right Front Go motor ID
+            public static final int angleMotorID = 5; // Right Front Turn motor ID
+            public static final int canCoderID = 13; // Right Front Encoder CAN ID, assuming it acts as the
                                                      // canCoder for
                                                      // this module
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(22.68 - 180 - 90); // Adjusted to
+            public static final Rotation2d angleOffset = Rotation2d.fromRotations(-0.458); // Adjusted to
             // match the
             // right front
             // encoder
@@ -152,12 +152,12 @@ public final class Constants {
         }
 
         public static final class Mod2 { // Back Left Module
-            public static final int driveMotorID = 5; // Left Back Go motor ID
-            public static final int angleMotorID = 6; // Left Back Turn motor ID
-            public static final int canCoderID = 22; // Left Back Encoder CAN ID, assuming it acts as the
+            public static final int driveMotorID = 2; // Left Back Go motor ID
+            public static final int angleMotorID = 1; // Left Back Turn motor ID
+            public static final int canCoderID = 11; // Left Back Encoder CAN ID, assuming it acts as the
                                                      // canCoder for
                                                      // this module
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(136.8 - 90); // Adjusted to
+            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.308); // Adjusted to
             // match the
             // left back
             // encoder offset
@@ -167,12 +167,12 @@ public final class Constants {
         }
 
         public static final class Mod3 { // Back Right Module
-            public static final int driveMotorID = 3; // Right Back Go motor ID
-            public static final int angleMotorID = 4; // Right Back Turn motor ID
-            public static final int canCoderID = 21; // Right Back Encoder CAN ID, assuming it acts as the
+            public static final int driveMotorID = 8; // Right Back Go motor ID
+            public static final int angleMotorID = 7; // Right Back Turn motor ID
+            public static final int canCoderID = 14; // Right Back Encoder CAN ID, assuming it acts as the
                                                      // canCoder for
                                                      // this module
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(160.2 - 90); // Adjusted to
+            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.251); // Adjusted to
             // match the
             // right
             // back encoder
@@ -224,8 +224,8 @@ public final class Constants {
             public static final int fireMotor2ID = 9; // Fire motor 2 ID
             public static final boolean fireMotor2Inverted = false; // Fire motor 2 inverted
             public static final double anglekS = 0.0; // Angle kS
+            public static final double anglekG = 0.0; // Angle kG
             public static final double anglekV = 0.0; // Angle kV
-            public static final double anglekA = 0.0; // Angle kA
             public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Brake; // Angle neutral mode
             public static final double angleKP = 0.0; // Angle kP
             public static final double angleKI = 0.0; // Angle kI
@@ -246,6 +246,8 @@ public final class Constants {
 
             public static final double downAngle = 0.0; // Down angle
             public static final double upAngle = 100.0; // Up angle
+
+            public static final int angleSensorPort = 0; // Angle sensor port
         }
     }
 
