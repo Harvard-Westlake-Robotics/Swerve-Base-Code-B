@@ -174,6 +174,14 @@ public final class Constants {
             public static final int intakeMotorID = 9; // Intake motor ID
             public static final int intakeSensorPort = 0; // Intake sensor ID
             public static final boolean intakeMotorInverted = false; // Intake motor inverted
+            public static final double kS = 0.0; // Intake kS
+            public static final double kV = 0.0; // Intake kV
+            public static final double kA = 0.0; // Intake kA
+            public static final NeutralModeValue intakeNeutralMode = NeutralModeValue.Brake; // Intake neutral mode
+            public static final double intakeKP = 0.0; // Intake kP
+            public static final double intakeKI = 0.0; // Intake kI
+            public static final double intakeKD = 0.0; // Intake kD
+
         }
     }
 

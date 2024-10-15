@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -26,7 +27,8 @@ public class SwerveModule {
 
     /* drive motor control requests */
     private final DutyCycleOut driveDutyCycle = new DutyCycleOut(0);
-    private final VelocityVoltage driveVelocity = new VelocityVoltage(0);
+    private final MotionMagicVelocityTorqueCurrentFOC driveVelocity = new MotionMagicVelocityTorqueCurrentFOC(0, 0,
+            true, 0, 0, false, false, false);
 
     /* angle motor control requests */
     private final PositionVoltage anglePosition = new PositionVoltage(0);
