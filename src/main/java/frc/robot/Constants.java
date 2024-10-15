@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.List;
+
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -282,23 +284,40 @@ public final class Constants {
                 kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
     }
 
-    public static final class Vision {
+public static final class Vision {
 
-        public static final class Cam1 {
-            public static final String kCameraName = "YOUR CAMERA NAME";
-            // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
-            public static final Transform3d kRobotToCam =
-                new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0));
+    public static final class CameraConfig {
+        public final String name;
+        public final Transform3d robotToCamera;
+
+        public CameraConfig(String name, Transform3d robotToCamera) {
+            this.name = name;
+            this.robotToCamera = robotToCamera;
         }
-        
-
-        // The layout of the AprilTags on the field
-        public static final AprilTagFieldLayout kTagLayout =
-                AprilTagFields.kDefaultField.loadAprilTagLayoutField();
-
-        // The standard deviations of our vision estimated poses, which affect correction rate
-        // (Fake values. Experiment and determine estimation noise on an actual robot.)
-        public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
-        public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
     }
+
+    public static final List<CameraConfig> CAMERAS = List.of(
+        new CameraConfig("Camera1", new Transform3d(
+            new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0))),
+        new CameraConfig("Camera2", new Transform3d(
+            new Translation3d(-0.5, 0.0, 0.5), new Rotation3d(0, Math.PI, 0))),
+        new CameraConfig("Camera3", new Transform3d(
+            new Translation3d(0.0, 0.5, 0.5), new Rotation3d(0, Math.PI / 2, 0))),
+        new CameraConfig("Camera4", new Transform3d(
+            new Translation3d(0.0, -0.5, 0.5), new Rotation3d(0, -Math.PI / 2, 0))),
+        new CameraConfig("Camera5", new Transform3d(
+            new Translation3d(0.0, 0.0, 1.0), new Rotation3d(-Math.PI / 2, 0, 0))),
+        new CameraConfig("Camera6", new Transform3d(
+            new Translation3d(0.0, 0.0, 0.0), new Rotation3d(Math.PI / 2, 0, 0)))
+    );
+
+    // The layout of the AprilTags on the field
+    public static final AprilTagFieldLayout kTagLayout =
+            AprilTagFields.kDefaultField.loadAprilTagLayoutField();
+
+    // The standard deviations of our vision estimated poses, which affect correction rate
+    // (Fake values. Experiment and determine estimation noise on an actual robot.)
+    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
+    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+}
 }

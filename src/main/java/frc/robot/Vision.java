@@ -1,27 +1,3 @@
-/*
- * MIT License
- *
- * Copyright (c) PhotonVision
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package frc.robot;
 
 import static frc.robot.Constants.Vision.*;
@@ -29,83 +5,117 @@ import static frc.robot.Constants.Vision.*;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.simulation.SimCameraProperties;
-import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 public class Vision {
-    private final PhotonCamera camera;
-    private final PhotonPoseEstimator photonEstimator;
-    private double lastEstTimestamp = 0;
+    private final List<PhotonCamera> cameras = new ArrayList<>();
+    private final List<PhotonPoseEstimator> photonEstimators = new ArrayList<>();
+    private final List<Double> lastEstTimestamps = new ArrayList<>();
 
     public Vision() {
-        camera = new PhotonCamera(Cam1.kCameraName);
-
-        photonEstimator =
-                new PhotonPoseEstimator(
-                        kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, Cam1.kRobotToCam);
-        photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-
-    }
-
-    public PhotonPipelineResult getLatestResult() {
-        return camera.getLatestResult();
-    }
-
-    /**
-     * The latest estimated robot pose on the field from vision data. This may be empty. This should
-     * only be called once per loop.
-     *
-     * @return An {@link EstimatedRobotPose} with an estimated pose, estimate timestamp, and targets
-     *     used for estimation.
-     */
-    public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-        var visionEst = photonEstimator.update();
-        double latestTimestamp = camera.getLatestResult().getTimestampSeconds();
-        boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
-        if (newResult) lastEstTimestamp = latestTimestamp;
-        return visionEst;
+        for (CameraConfig config : CAMERAS) {
+            PhotonCamera camera = new PhotonCamera(config.name);
+            PhotonPoseEstimator estimator = new PhotonPoseEstimator(
+                    kTagLayout,
+                    PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                    camera,
+                    config.robotToCamera);
+            estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+            cameras.add(camera);
+            photonEstimators.add(estimator);
+            lastEstTimestamps.add(0.0);
+        }
     }
 
     /**
-     * The standard deviations of the estimated pose from {@link #getEstimatedGlobalPose()}, for use
-     * with {@link edu.wpi.first.math.estimator.SwerveDrivePoseEstimator SwerveDrivePoseEstimator}.
-     * This should only be used when there are targets visible.
+     * Returns a list of vision measurements from all cameras that can be used with
+     * a SwerveDrivePoseEstimator. Only includes measurements where AprilTags are detected.
      *
-     * @param estimatedPose The estimated pose to guess standard deviations for.
+     * @return A list of VisionMeasurement instances containing estimated poses and standard deviations.
      */
-    public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
+    public List<VisionMeasurement> getVisionMeasurements() {
+        List<VisionMeasurement> measurements = new ArrayList<>();
+        for (int i = 0; i < photonEstimators.size(); i++) {
+            PhotonPoseEstimator estimator = photonEstimators.get(i);
+            Optional<EstimatedRobotPose> visionEst = estimator.update();
+            if (visionEst.isPresent()) {
+                double latestTimestamp = cameras.get(i).getLatestResult().getTimestampSeconds();
+                boolean newResult = Math.abs(latestTimestamp - lastEstTimestamps.get(i)) > 1e-5;
+                if (newResult) {
+                    lastEstTimestamps.set(i, latestTimestamp);
+
+                    EstimatedRobotPose estimatedPose = visionEst.get();
+                    PhotonPipelineResult result = cameras.get(i).getLatestResult();
+                    Matrix<N3, N1> stdDevs = getEstimationStdDevs(result, estimatedPose);
+
+                    measurements.add(new VisionMeasurement(estimatedPose.estimatedPose.toPose2d(), stdDevs, latestTimestamp));
+                }
+            }
+        }
+        return measurements;
+    }
+
+    /**
+     * Calculates the standard deviations for an estimated pose based on the number of visible targets
+     * and their average distance. This helps in adjusting the confidence level of the measurements.
+     *
+     * @param result The latest pipeline result from the camera.
+     * @param estimatedPose The estimated robot pose.
+     * @return A Matrix containing the standard deviations.
+     */
+    public Matrix<N3, N1> getEstimationStdDevs(PhotonPipelineResult result, EstimatedRobotPose estimatedPose) {
         var estStdDevs = kSingleTagStdDevs;
-        var targets = getLatestResult().getTargets();
+        var targets = result.getTargets();
         int numTags = 0;
         double avgDist = 0;
+
         for (var tgt : targets) {
-            var tagPose = photonEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+            var tagPose = kTagLayout.getTagPose(tgt.getFiducialId());
             if (tagPose.isEmpty()) continue;
             numTags++;
-            avgDist +=
-                    tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
+            avgDist += tagPose.get()
+                    .toPose2d()
+                    .getTranslation()
+                    .getDistance(estimatedPose.estimatedPose.toPose2d().getTranslation());
         }
+
         if (numTags == 0) return estStdDevs;
         avgDist /= numTags;
-        // Decrease std devs if multiple targets are visible
-        if (numTags > 1) estStdDevs = kMultiTagStdDevs;
-        // Increase std devs based on (average) distance
-        if (numTags == 1 && avgDist > 4)
+
+        // Adjust standard deviations based on the number of tags and average distance
+        if (numTags > 1) {
+            estStdDevs = kMultiTagStdDevs;
+        }
+        if (numTags == 1 && avgDist > 4) {
             estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+        } else {
+            estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+        }
 
         return estStdDevs;
     }
 
+    /**
+     * A helper class to hold the estimated robot pose and its associated standard deviations.
+     */
+    public static class VisionMeasurement {
+        public final Pose2d estimatedPose;
+        public final Matrix<N3, N1> stdDevs;
+        public final double timestamp;
+
+        public VisionMeasurement(Pose2d estimatedPose, Matrix<N3, N1> stdDevs, double timestamp) {
+            this.estimatedPose = estimatedPose;
+            this.stdDevs = stdDevs;
+            this.timestamp = timestamp;
+        }
+    }
 }
