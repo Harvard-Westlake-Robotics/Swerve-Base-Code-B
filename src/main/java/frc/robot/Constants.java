@@ -3,6 +3,7 @@ package frc.robot;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -172,7 +173,6 @@ public final class Constants {
 
         public static final class Intake { // Intake
             public static final int intakeMotorID = 9; // Intake motor ID
-            public static final int intakeSensorPort = 0; // Intake sensor ID
             public static final boolean intakeMotorInverted = false; // Intake motor inverted
             public static final double kS = 0.0; // Intake kS
             public static final double kV = 0.0; // Intake kV
@@ -182,6 +182,59 @@ public final class Constants {
             public static final double intakeKI = 0.0; // Intake kI
             public static final double intakeKD = 0.0; // Intake kD
 
+        }
+
+        public static final class Carriage { // Carriage
+            public static final int carriageMotorID = 9; // Carriage motor ID
+            public static final int carriageSensorPort = 0; // Carriage sensor ID
+            public static final boolean carriageMotorInverted = false; // Carriage motor inverted
+            public static final double kS = 0.0; // Carriage kS
+            public static final double kV = 0.0; // Carriage kV
+            public static final double kA = 0.0; // Carriage kA
+            public static final NeutralModeValue carriageNeutralMode = NeutralModeValue.Brake; // Carriage neutral mode
+            public static final double carriageKP = 0.0; // Carriage kP
+            public static final double carriageKI = 0.0; // Carriage kI
+            public static final double carriageKD = 0.0; // Carriage kD
+
+            public static final double intakeVelocity = 0.0; // Carriage intake velocity
+            public static final double outtakeVelocity = 0.0; // Carriage outtake velocity
+            public static final double prepShotVelocity = 0.0; // Carriage prep shot velocity
+            public static final double fireVelocity = 0.0; // Carriage fire velocity
+            public static final double intakeSlowVelocity = 0.0; // Carriage intake slow velocity
+        }
+
+        public static final class Shooter { // Shooter
+            public static final int angleMotor1ID = 9; // Angling motor 1 ID
+            public static final boolean angleMotor1Inverted = false; // Angling motor 1 inverted
+            public static final int angleMotor2ID = 9; // Angling motor 2 ID
+            public static final boolean angleMotor2Inverted = false; // Angling motor 2 inverted
+            public static final int fireMotor1ID = 9; // Fire motor 1 ID
+            public static final boolean fireMotor1Inverted = false; // Fire motor 1 inverted
+            public static final int fireMotor2ID = 9; // Fire motor 2 ID
+            public static final boolean fireMotor2Inverted = false; // Fire motor 2 inverted
+            public static final double anglekS = 0.0; // Angle kS
+            public static final double anglekV = 0.0; // Angle kV
+            public static final double anglekA = 0.0; // Angle kA
+            public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Brake; // Angle neutral mode
+            public static final double angleKP = 0.0; // Angle kP
+            public static final double angleKI = 0.0; // Angle kI
+            public static final double angleKD = 0.0; // Angle kD
+
+            public static final double shootkS = 0.0; // Shoot kS
+            public static final double shootkV = 0.0; // Shoot kV
+            public static final double shootkA = 0.0; // Shoot kA
+            public static final NeutralModeValue fireNeutralMode = NeutralModeValue.Brake; // Shoot neutral mode
+            public static final double shootKP = 0.0; // Shoot kP
+            public static final double shootKI = 0.0; // Shoot kI
+            public static final double shootKD = 0.0; // Shoot kD
+
+            public static final double shootVelocity = 0.0; // Shoot velocity
+            public static final double passVelocity = 0.0; // Pass velocity
+            public static final double outtakeVelocity = 0.0; // Outtake velocity
+            public static final double ampVelocity = 0.0; // Amp velocity
+
+            public static final double downAngle = 0.0; // Down angle
+            public static final double upAngle = 100.0; // Up angle
         }
     }
 
@@ -199,7 +252,15 @@ public final class Constants {
         private static PIDConstants translationConstants = new PIDConstants(1.1, 0.0, 0.0);
         private static PIDConstants rotationConstants = new PIDConstants(1.9, 0, 0.0);
         private static ReplanningConfig replanningConfig = new ReplanningConfig();
-        private static SendableChooser<String> autoChooser = new SendableChooser<String>();
+        private static SendableChooser<PathPlannerAuto> autoChooser = new SendableChooser<PathPlannerAuto>();
+
+        public static SendableChooser<PathPlannerAuto> getAutoChooser() {
+            return autoChooser;
+        }
+
+        public static void configureAutos() {
+            autoChooser.setDefaultOption("", new PathPlannerAuto("null"));
+        }
 
         public static HolonomicPathFollowerConfig getPathFollowerConfig() {
             return new HolonomicPathFollowerConfig(translationConstants, rotationConstants,

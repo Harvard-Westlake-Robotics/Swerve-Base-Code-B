@@ -13,11 +13,11 @@ import frc.robot.util.BinarySensor;
 public class Intake extends SubsystemBase {
     private static Intake instance;
     private TalonFX intakeMotor;
-    private BinarySensor intakeSensor;
     private double velocity = 0.0;
     private final SimpleMotorFeedforward feedForward;
     private int intakeSpeed = 10;
     private int outtakeSpeed = -10;
+    private MotionMagicVelocityTorqueCurrentFOC intakeControl;
 
     public int getIntakeSpeed() {
         return intakeSpeed;
@@ -39,12 +39,12 @@ public class Intake extends SubsystemBase {
         this.intakeMotor.getConfigurator().apply(new Slot0Configs().withKP(Constants.Swerve.Intake.intakeKP)
                 .withKI(Constants.Swerve.Intake.intakeKI).withKD(Constants.Swerve.Intake.intakeKD));
         this.intakeMotor.setInverted(Constants.Swerve.Intake.intakeMotorInverted);
-        this.intakeSensor = new BinarySensor(Constants.Swerve.Intake.intakeSensorPort);
         this.feedForward = new SimpleMotorFeedforward(Constants.Swerve.Intake.kS, Constants.Swerve.Intake.kV,
                 Constants.Swerve.Intake.kA);
         this.intakeMotor.setNeutralMode(Constants.Swerve.Intake.intakeNeutralMode);
-        this.intakeMotor.setControl(new MotionMagicVelocityTorqueCurrentFOC(velocity, 0.0, true,
-                feedForward.calculate(velocity), 0, false, true, false));
+        this.intakeControl = new MotionMagicVelocityTorqueCurrentFOC(0, 0, true, 0, 0, false, false, false);
+        this.intakeMotor.setControl(intakeControl);
+
     }
 
     public void setVelocity(double speed) {
@@ -63,12 +63,11 @@ public class Intake extends SubsystemBase {
         velocity = 0.0;
     }
 
-    public BinarySensor getIntakeSensor() {
-        return intakeSensor;
-    }
-
     @Override
     public void periodic() {
+        intakeControl = new MotionMagicVelocityTorqueCurrentFOC(velocity, 0.0, true,
+                feedForward.calculate(velocity), 0, false, true, false);
+        this.intakeMotor.setControl(intakeControl);
         this.intakeMotor.set(velocity);
     }
 }
