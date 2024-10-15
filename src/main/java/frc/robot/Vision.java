@@ -7,6 +7,8 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import frc.robot.util.FieldData;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +41,7 @@ public class Vision {
     /**
      * Returns a list of vision measurements from all cameras that can be used with
      * a SwerveDrivePoseEstimator. Only includes measurements where AprilTags are detected.
+     * During autonomous, discards measurements where the closest tag is more than 0.4 meters away.
      *
      * @return A list of VisionMeasurement instances containing estimated poses and standard deviations.
      */
@@ -57,7 +60,29 @@ public class Vision {
                     PhotonPipelineResult result = cameras.get(i).getLatestResult();
                     Matrix<N3, N1> stdDevs = getEstimationStdDevs(result, estimatedPose);
 
-                    measurements.add(new VisionMeasurement(estimatedPose.estimatedPose.toPose2d(), stdDevs, latestTimestamp));
+                    // Check if we need to discard the measurement during autonomous
+                    boolean discardMeasurement = false;
+                    if (FieldData.getIsAuto()) {
+                        double minDist = Double.MAX_VALUE;
+                        for (var target : result.getTargets()) {
+                            var tagPoseOptional = kTagLayout.getTagPose(target.getFiducialId());
+                            if (tagPoseOptional.isEmpty()) continue;
+                            var tagPose = tagPoseOptional.get().toPose2d();
+                            double distance = tagPose.getTranslation().getDistance(
+                                    estimatedPose.estimatedPose.toPose2d().getTranslation());
+                            if (distance < minDist) {
+                                minDist = distance;
+                            }
+                        }
+                        if (minDist > 0.4) {
+                            discardMeasurement = true;
+                        }
+                    }
+
+                    if (!discardMeasurement) {
+                        measurements.add(new VisionMeasurement(
+                                estimatedPose.estimatedPose.toPose2d(), stdDevs, latestTimestamp));
+                    }
                 }
             }
         }
