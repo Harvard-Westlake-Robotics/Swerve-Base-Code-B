@@ -182,6 +182,7 @@ public final class Constants {
                     canCoderID, angleOffset);
         }
 
+<<<<<<< HEAD
 public static final class Intake { // Intake
             public static final int intakeMotorID = 9; // Intake motor ID
             public static final boolean intakeMotorInverted = false; // Intake motor inverted
@@ -189,6 +190,13 @@ public static final class Intake { // Intake
             public static final double kV = 0.05; // Intake kV
             public static final double kA = 0.01; // Intake kA
 =======
+        public static final class Intake { // Intake
+            public static final int intakeMotorID = 9; // Intake motor ID
+            public static final boolean intakeMotorInverted = false; // Intake motor inverted
+            public static final double kS = 0.0; // Intake kS
+            public static final double kV = 0.0; // Intake kV
+            public static final double kA = 0.0; // Intake kA
+>>>>>>> parent of bbb0d62 (In person tests 1)
             public static final NeutralModeValue intakeNeutralMode = NeutralModeValue.Brake; // Intake neutral mode
             public static final double intakeKP = 0.1; // Intake kP
             public static final double intakeKI = 0.0; // Intake kI
@@ -197,17 +205,26 @@ public static final class Intake { // Intake
         }
 
         public static final class Carriage { // Carriage
+<<<<<<< HEAD
             public static final int carriageMotorID = 10; // Carriage motor ID
+=======
+            public static final int carriageMotorID = 9; // Carriage motor ID
+>>>>>>> parent of bbb0d62 (In person tests 1)
             public static final int carriageSensorPort = 0; // Carriage sensor ID
             public static final boolean carriageMotorInverted = false; // Carriage motor inverted
             public static final double kS = 0.15; // Carriage kS
             public static final double kV = 0.08; // Carriage kV
             public static final double kA = 0.02; // Carriage kA
             public static final NeutralModeValue carriageNeutralMode = NeutralModeValue.Brake; // Carriage neutral mode
+<<<<<<< HEAD
             public static final double carriageKP = 0.15; // Carriage kP
+=======
+            public static final double carriageKP = 0.0; // Carriage kP
+>>>>>>> parent of bbb0d62 (In person tests 1)
             public static final double carriageKI = 0.0; // Carriage kI
             public static final double carriageKD = 0.02; // Carriage kD
 
+<<<<<<< HEAD
             public static final double intakeVelocity = 0.7; // Carriage intake velocity
             public static final double outtakeVelocity = -0.5; // Carriage outtake velocity
             public static final double prepShotVelocity = 0.3; // Carriage prep shot velocity
@@ -227,6 +244,27 @@ public static final class Intake { // Intake
             public static final double anglekS = 0.2; // Angle kS
             public static final double anglekG = 0.5; // Angle kG
             public static final double anglekV = 0.12; // Angle kV
+=======
+            public static final double intakeVelocity = 0.0; // Carriage intake velocity
+            public static final double outtakeVelocity = 0.0; // Carriage outtake velocity
+            public static final double prepShotVelocity = 0.0; // Carriage prep shot velocity
+            public static final double fireVelocity = 0.0; // Carriage fire velocity
+            public static final double intakeSlowVelocity = 0.0; // Carriage intake slow velocity
+        }
+
+        public static final class Shooter { // Shooter
+            public static final int angleMotor1ID = 9; // Angling motor 1 ID
+            public static final boolean angleMotor1Inverted = false; // Angling motor 1 inverted
+            public static final int angleMotor2ID = 9; // Angling motor 2 ID
+            public static final boolean angleMotor2Inverted = false; // Angling motor 2 inverted
+            public static final int fireMotor1ID = 9; // Fire motor 1 ID
+            public static final boolean fireMotor1Inverted = false; // Fire motor 1 inverted
+            public static final int fireMotor2ID = 9; // Fire motor 2 ID
+            public static final boolean fireMotor2Inverted = false; // Fire motor 2 inverted
+            public static final double anglekS = 0.0; // Angle kS
+            public static final double anglekG = 0.0; // Angle kG
+            public static final double anglekV = 0.0; // Angle kV
+>>>>>>> parent of bbb0d62 (In person tests 1)
             public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Brake; // Angle neutral mode
             public static final double angleKP = 0.2; // Angle kP
             public static final double angleKI = 0.0; // Angle kI
@@ -240,10 +278,17 @@ public static final class Intake { // Intake
             public static final double shootKI = 0.0; // Shoot kI
             public static final double shootKD = 0.03; // Shoot kD
 
+<<<<<<< HEAD
             public static final double shootVelocity = 5000.0; // Shoot velocity (RPM)
             public static final double passVelocity = 2000.0; // Pass velocity (RPM)
             public static final double outtakeVelocity = -1000.0; // Outtake velocity (RPM)
             public static final double ampVelocity = 1500.0; // Amp velocity (RPM)
+=======
+            public static final double shootVelocity = 0.0; // Shoot velocity
+            public static final double passVelocity = 0.0; // Pass velocity
+            public static final double outtakeVelocity = 0.0; // Outtake velocity
+            public static final double ampVelocity = 0.0; // Amp velocity
+>>>>>>> parent of bbb0d62 (In person tests 1)
 
             public static final double downAngle = 15.0; // Down angle (degrees)
             public static final double upAngle = 75.0; // Up angle (degrees)
