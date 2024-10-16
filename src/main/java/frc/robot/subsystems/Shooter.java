@@ -21,7 +21,6 @@ public class Shooter extends SubsystemBase {
     private double angleTarget = 0.0;
     private double angleCurrent = 0.0;
     private boolean isAtVelocity = false;
-
     public double getAngleCurrent() {
         return angleCurrent;
     }
@@ -38,10 +37,8 @@ public class Shooter extends SubsystemBase {
     private NeutralModeValue currentFireNeutralMode = Constants.Swerve.Shooter.fireNeutralMode;
     private NeutralModeValue currentAngleNeutralMode = Constants.Swerve.Shooter.angleNeutralMode;
     private BinarySensor angleSensor;
-    private SimpleMotorFeedforward shooterFeedforward = new SimpleMotorFeedforward(Constants.Swerve.Shooter.shootkS,
-            Constants.Swerve.Shooter.shootkV, Constants.Swerve.Shooter.shootkA);
-    private ArmFeedforward angleFeedForward = new ArmFeedforward(Constants.Swerve.Shooter.anglekS,
-            Constants.Swerve.Shooter.anglekG, Constants.Swerve.Shooter.anglekV);
+    private SimpleMotorFeedforward shooterFeedforward = new SimpleMotorFeedforward(Constants.Swerve.Shooter.shootkS, Constants.Swerve.Shooter.shootkV, Constants.Swerve.Shooter.shootkA);
+    private ArmFeedforward angleFeedForward = new ArmFeedforward(Constants.Swerve.Shooter.anglekS, Constants.Swerve.Shooter.anglekG, Constants.Swerve.Shooter.anglekV);
 
     public static Shooter getInstance() {
         if (instance == null) {
