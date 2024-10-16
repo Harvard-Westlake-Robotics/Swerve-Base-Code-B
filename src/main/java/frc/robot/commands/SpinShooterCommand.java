@@ -21,16 +21,10 @@ public class SpinShooterCommand extends Command {
 
     @Override
     public void initialize() {
-        currentPose = Swerve.getInstance().getPose();
-        solution = ShotCalculator.calculateOptimalShooterParameters(currentPose);
-        if(solution != null) {
+        if(solution != null){
+            Shooter.getInstance().setAngleTarget(solution.angle);
             Shooter.getInstance().setVelocity(solution.velocity);
-            Shooter.getInstance().setAngleCurrent(solution.angle);
-        } else{
-            Shooter.getInstance().setVelocity(10);
         }
-        originalFireControl = Shooter.getInstance().getFireControl();
-        Shooter.getInstance().setFireControl(originalFireControl.withAcceleration(1));
     }
 
     @Override
