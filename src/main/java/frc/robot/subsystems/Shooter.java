@@ -4,10 +4,13 @@ import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.math.controller.*;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.math.Clamp;
 import frc.robot.Constants;
 import frc.robot.util.BinarySensor;
 
@@ -19,10 +22,18 @@ public class Shooter extends SubsystemBase {
     private TalonFX angleMotor2;
     private double velocity = 0.0;
     private double angleTarget = 0.0;
+    public double getAngleTarget() {
+        return Units.rotationsToDegrees(angleTarget);
+    }
+
     private double angleCurrent = 0.0;
     private boolean isAtVelocity = false;
+    public boolean isAtVelocity() {
+        return isAtVelocity;
+    }
+
     public double getAngleCurrent() {
-        return angleCurrent;
+        return Units.rotationsToDegrees(angleCurrent);
     }
 
     public void setAngleCurrent(double angleCurrent) {
@@ -31,9 +42,9 @@ public class Shooter extends SubsystemBase {
 
     private SendableChooser<NeutralModeValue> angleNeutralModeChooser = new SendableChooser<>();
     private SendableChooser<NeutralModeValue> fireNeutralModeChooser = new SendableChooser<>();
-    private MotionMagicVelocityTorqueCurrentFOC fireControl;
+    private MotionMagicVelocityTorqueCurrentFOC fireControl = new MotionMagicVelocityTorqueCurrentFOC(velocity, 0.0, false, 0, 0, false, true, false);;
     private MotionMagicVelocityTorqueCurrentFOC lastFireControl;
-    private MotionMagicTorqueCurrentFOC angleControl;
+    private MotionMagicTorqueCurrentFOC angleControl = new MotionMagicTorqueCurrentFOC(angleTarget, 0.0, 0, false, false, false);
     private NeutralModeValue currentFireNeutralMode = Constants.Swerve.Shooter.fireNeutralMode;
     private NeutralModeValue currentAngleNeutralMode = Constants.Swerve.Shooter.angleNeutralMode;
     private BinarySensor angleSensor;
@@ -100,7 +111,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void setAngleTarget(double angle) {
-        this.angleTarget = angle;
+        this.angleTarget = (angle / 360); //Turn degrees into rotations, todo multiply by gear ratio of rotations of motor per rotation of shooter
     }
 
     public void stop() {
@@ -154,6 +165,11 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
+        angleTarget = Clamp.clamp(angleTarget, Constants.Swerve.Shooter.upAngle, Constants.Swerve.Shooter.downAngle);
+        // if((angleMotor1.getPosition().getValueAsDouble() * 360 + angleMotor2.getPosition().getValueAsDouble() * 360) / 2 > Constants.Swerve.Shooter.upAngle + 5) {
+        //     angleMotor1.setVoltage(0);
+        //     angleMotor2.setVoltage(0);
+        // }
         if (Math.abs(velocity
                 - (shooterMotor1.getVelocity().getValueAsDouble() + shooterMotor2.getVelocity().getValueAsDouble())
                         / 2) < 0.5) {
@@ -167,19 +183,13 @@ public class Shooter extends SubsystemBase {
 
         if (angleSensor.get()) {
             angleCurrent = 0.0;
-        } else {
-            angleCurrent = (angleMotor1.getPosition().getValueAsDouble() + angleMotor2.getPosition().getValueAsDouble())
-                    / 2;
-        }
-        if (fireControl != null)
-            setFireControl(fireControl.withFeedForward(shooterFeedforward.calculate(velocity)));
-        if (angleControl != null)
-            setAngleControl(angleControl.withFeedForward(angleFeedForward.calculate(angleCurrent, velocity)));
+        } //else {
+           // angleCurrent = (angleMotor1.getPosition().getValueAsDouble() + angleMotor2.getPosition().getValueAsDouble())
+               //     / 2;
+        //}
+        setFireControl(fireControl.withFeedForward(shooterFeedforward.calculate(velocity)).withVelocity(velocity));
+        setAngleControl(angleControl.withPosition(angleTarget).withFeedForward(angleFeedForward.calculate(angleCurrent, velocity)));
 
-        this.shooterMotor1.set(velocity);
-        this.shooterMotor2.set(velocity);
-        this.angleMotor1.setPosition(angleCurrent);
-        this.angleMotor2.setPosition(angleTarget);
 
         if (getFireNeutralMode() != fireNeutralModeChooser.getSelected()) {
             setFireNeutralMode(fireNeutralModeChooser.getSelected());
