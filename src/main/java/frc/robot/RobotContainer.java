@@ -30,10 +30,7 @@ public class RobotContainer {
     private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton robotCentric = new JoystickButton(driver,
             XboxController.Button.kLeftBumper.value);
-    private final JoystickButton intakeButton = new JoystickButton(driver, PS4Controller.Button.kCircle.value);
     private static final boolean isDrifting = false;
-    private final JoystickButton spinShooter = new JoystickButton(driver, PS4Controller.Button.kL2.value);
-    private final JoystickButton angleButton = new JoystickButton(driver, PS4Controller.Button.kL1.value);
 
     public static boolean isDrifting() {
         return isDrifting;
@@ -41,9 +38,6 @@ public class RobotContainer {
 
     /* Subsystems */
     private final Swerve s_Swerve = Swerve.getInstance();
-    private final Intake intake = Intake.getInstance();
-    private final Carriage carriage = Carriage.getInstance();
-    private final Shooter shooter = Shooter.getInstance();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -85,9 +79,12 @@ public class RobotContainer {
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
         // isDrifting.onTrue(new InstantCommand((() -> s_Swerve.isDrifting =
         // !s_Swerve.isDrifting)));
+<<<<<<< HEAD
         intakeButton.onTrue(new IntakeCommand().withTimeout(5));
         spinShooter.onTrue(new InstantCommand(() -> shooter.toggleShooter()));
         angleButton.onTrue(new ShooterPresetCommand());
+=======
+>>>>>>> parent of bbb0d62 (In person tests 1)
     }
 
     public static boolean getIsRed() {
