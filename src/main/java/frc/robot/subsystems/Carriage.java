@@ -144,6 +144,11 @@ public class Carriage extends SubsystemBase {
         motor.setControl(motorControl);
         motor.set(velocity);
 
+        if (noteSensor.justEnabled()) {
+            hasNote = true;
+            stop();
+        }
+
         SmartDashboard.putBoolean("Has Note", hasNote);
         SmartDashboard.putData("Carriage Neutral Mode", neutralModeChooser);
         if (neutralModeChooser.getSelected() != currentNeutralMode) {

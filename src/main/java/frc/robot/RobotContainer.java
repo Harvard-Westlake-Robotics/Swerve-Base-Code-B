@@ -85,9 +85,32 @@ public class RobotContainer {
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
         // isDrifting.onTrue(new InstantCommand((() -> s_Swerve.isDrifting =
         // !s_Swerve.isDrifting)));
-        intakeButton.onTrue(new IntakeCommand().withTimeout(5));
+        intakeButton.onTrue(new Command() {
+            @Override
+            public void initialize() {
+                intake.intake();
+                carriage.intake();
+            }
+
+            @Override
+            public void execute() {
+                intake.setVelocity(carriage.getVelocity());
+                carriage.intake();
+                if (carriage.getNoteSensor().justEnabled() || carriage.isHasNote()) {
+                    this.cancel();
+                }
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                intake.stop();
+                carriage.stop();
+            }
+        }.withTimeout(5));
         spinShooter.onTrue(new InstantCommand(() -> shooter.toggleShooter()));
-        angleButton.onTrue(new ShooterPresetCommand());
+        angleButton.onTrue(new InstantCommand(() -> {
+            shooter.setAngleTarget(0.5);
+        }));
     }
 
     public static boolean getIsRed() {
