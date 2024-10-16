@@ -188,6 +188,7 @@ public static final class Intake { // Intake
             public static final double kS = 0.1; // Intake kS
             public static final double kV = 0.05; // Intake kV
             public static final double kA = 0.01; // Intake kA
+=======
             public static final NeutralModeValue intakeNeutralMode = NeutralModeValue.Brake; // Intake neutral mode
             public static final double intakeKP = 0.1; // Intake kP
             public static final double intakeKI = 0.0; // Intake kI
