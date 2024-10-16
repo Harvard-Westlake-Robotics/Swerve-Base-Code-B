@@ -28,7 +28,6 @@ public class Swerve extends SubsystemBase {
     private NeutralModeValue neutralMode = Constants.Swerve.driveNeutralMode;
     private SendableChooser<NeutralModeValue> neutralModeChooser = new SendableChooser<>();
 
-
     public NeutralModeValue getNeutralMode() {
         return neutralMode;
     }

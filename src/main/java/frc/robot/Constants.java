@@ -183,8 +183,8 @@ public final class Constants {
         }
 
         public static final class Intake { // Intake
-            public static final int intakeMotorID = 9; // Intake motor ID
-            public static final boolean intakeMotorInverted = false; // Intake motor inverted
+            public static final int intakeMotorID = 21; // Intake motor ID
+            public static final boolean intakeMotorInverted = true; // Intake motor inverted
             public static final double kS = 0.0; // Intake kS
             public static final double kV = 0.0; // Intake kV
             public static final double kA = 0.0; // Intake kA
@@ -196,18 +196,18 @@ public final class Constants {
         }
 
         public static final class Carriage { // Carriage
-            public static final int carriageMotorID = 9; // Carriage motor ID
-            public static final int carriageSensorPort = 0; // Carriage sensor ID
+            public static final int carriageMotorID = 20; // Carriage motor ID
+            public static final int carriageSensorPort = 9; // Carriage sensor ID
             public static final boolean carriageMotorInverted = false; // Carriage motor inverted
             public static final double kS = 0.0; // Carriage kS
             public static final double kV = 0.0; // Carriage kV
             public static final double kA = 0.0; // Carriage kA
             public static final NeutralModeValue carriageNeutralMode = NeutralModeValue.Brake; // Carriage neutral mode
-            public static final double carriageKP = 0.0; // Carriage kP
+            public static final double carriageKP = 12.0; // Carriage kP
             public static final double carriageKI = 0.0; // Carriage kI
             public static final double carriageKD = 0.0; // Carriage kD
 
-            public static final double intakeVelocity = 0.0; // Carriage intake velocity
+            public static final double intakeVelocity = 100.0; // Carriage intake velocity
             public static final double outtakeVelocity = 0.0; // Carriage outtake velocity
             public static final double prepShotVelocity = 0.0; // Carriage prep shot velocity
             public static final double fireVelocity = 0.0; // Carriage fire velocity
@@ -215,14 +215,14 @@ public final class Constants {
         }
 
         public static final class Shooter { // Shooter
-            public static final int angleMotor1ID = 9; // Angling motor 1 ID
+            public static final int angleMotor1ID = 24; // Angling motor 1 ID
             public static final boolean angleMotor1Inverted = false; // Angling motor 1 inverted
-            public static final int angleMotor2ID = 9; // Angling motor 2 ID
-            public static final boolean angleMotor2Inverted = false; // Angling motor 2 inverted
-            public static final int fireMotor1ID = 9; // Fire motor 1 ID
+            public static final int angleMotor2ID = 26; // Angling motor 2 ID
+            public static final boolean angleMotor2Inverted = true; // Angling motor 2 inverted
+            public static final int fireMotor1ID = 22; // Fire motor 1 ID
             public static final boolean fireMotor1Inverted = false; // Fire motor 1 inverted
-            public static final int fireMotor2ID = 9; // Fire motor 2 ID
-            public static final boolean fireMotor2Inverted = false; // Fire motor 2 inverted
+            public static final int fireMotor2ID = 23; // Fire motor 2 ID
+            public static final boolean fireMotor2Inverted = true; // Fire motor 2 inverted
             public static final double anglekS = 0.0; // Angle kS
             public static final double anglekG = 0.0; // Angle kG
             public static final double anglekV = 0.0; // Angle kV
@@ -239,7 +239,7 @@ public final class Constants {
             public static final double shootKI = 0.0; // Shoot kI
             public static final double shootKD = 0.0; // Shoot kD
 
-            public static final double shootVelocity = 0.0; // Shoot velocity
+            public static final double shootVelocity = 100.0; // Shoot velocity
             public static final double passVelocity = 0.0; // Pass velocity
             public static final double outtakeVelocity = 0.0; // Outtake velocity
             public static final double ampVelocity = 0.0; // Amp velocity
@@ -286,40 +286,39 @@ public final class Constants {
                 kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
     }
 
-public static final class Vision {
+    public static final class Vision {
 
-    public static final class CameraConfig {
-        public final String name;
-        public final Transform3d robotToCamera;
+        public static final class CameraConfig {
+            public final String name;
+            public final Transform3d robotToCamera;
 
-        public CameraConfig(String name, Transform3d robotToCamera) {
-            this.name = name;
-            this.robotToCamera = robotToCamera;
+            public CameraConfig(String name, Transform3d robotToCamera) {
+                this.name = name;
+                this.robotToCamera = robotToCamera;
+            }
         }
+
+        public static final List<CameraConfig> CAMERAS = List.of(
+                new CameraConfig("Camera1", new Transform3d(
+                        new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0))),
+                new CameraConfig("Camera2", new Transform3d(
+                        new Translation3d(-0.5, 0.0, 0.5), new Rotation3d(0, Math.PI, 0))),
+                new CameraConfig("Camera3", new Transform3d(
+                        new Translation3d(0.0, 0.5, 0.5), new Rotation3d(0, Math.PI / 2, 0))),
+                new CameraConfig("Camera4", new Transform3d(
+                        new Translation3d(0.0, -0.5, 0.5), new Rotation3d(0, -Math.PI / 2, 0))),
+                new CameraConfig("Camera5", new Transform3d(
+                        new Translation3d(0.0, 0.0, 1.0), new Rotation3d(-Math.PI / 2, 0, 0))),
+                new CameraConfig("Camera6", new Transform3d(
+                        new Translation3d(0.0, 0.0, 0.0), new Rotation3d(Math.PI / 2, 0, 0))));
+
+        // The layout of the AprilTags on the field
+        public static final AprilTagFieldLayout kTagLayout = AprilTagFields.kDefaultField.loadAprilTagLayoutField();
+
+        // The standard deviations of our vision estimated poses, which affect
+        // correction rate
+        // (Fake values. Experiment and determine estimation noise on an actual robot.)
+        public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
+        public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
     }
-
-    public static final List<CameraConfig> CAMERAS = List.of(
-        new CameraConfig("Camera1", new Transform3d(
-            new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0))),
-        new CameraConfig("Camera2", new Transform3d(
-            new Translation3d(-0.5, 0.0, 0.5), new Rotation3d(0, Math.PI, 0))),
-        new CameraConfig("Camera3", new Transform3d(
-            new Translation3d(0.0, 0.5, 0.5), new Rotation3d(0, Math.PI / 2, 0))),
-        new CameraConfig("Camera4", new Transform3d(
-            new Translation3d(0.0, -0.5, 0.5), new Rotation3d(0, -Math.PI / 2, 0))),
-        new CameraConfig("Camera5", new Transform3d(
-            new Translation3d(0.0, 0.0, 1.0), new Rotation3d(-Math.PI / 2, 0, 0))),
-        new CameraConfig("Camera6", new Transform3d(
-            new Translation3d(0.0, 0.0, 0.0), new Rotation3d(Math.PI / 2, 0, 0)))
-    );
-
-    // The layout of the AprilTags on the field
-    public static final AprilTagFieldLayout kTagLayout =
-            AprilTagFields.kDefaultField.loadAprilTagLayoutField();
-
-    // The standard deviations of our vision estimated poses, which affect correction rate
-    // (Fake values. Experiment and determine estimation noise on an actual robot.)
-    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
-    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
-}
 }

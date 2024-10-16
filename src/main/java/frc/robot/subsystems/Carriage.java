@@ -19,11 +19,17 @@ public class Carriage extends SubsystemBase {
     private static Carriage instance;
     private TalonFX motor;
     private BinarySensor noteSensor;
+
+    public BinarySensor getNoteSensor() {
+        return noteSensor;
+    }
+
     private MotionMagicVelocityTorqueCurrentFOC motorControl;
     private SimpleMotorFeedforward feedforward;
     boolean prepShot = false;
     boolean isFiring = false;
-    boolean hasNote = true;
+    boolean hasNote = false;
+
     public boolean isHasNote() {
         return hasNote;
     }
@@ -47,7 +53,7 @@ public class Carriage extends SubsystemBase {
                 Constants.Swerve.Carriage.kV, Constants.Swerve.Carriage.kA);
         this.motor.getConfigurator().apply(new Slot0Configs().withKP(Constants.Swerve.Carriage.carriageKP)
                 .withKI(Constants.Swerve.Carriage.carriageKI).withKD(Constants.Swerve.Carriage.carriageKD));
-        this.motorControl = new MotionMagicVelocityTorqueCurrentFOC(0, 0, true, 0, 0, false, false, false);
+        this.motorControl = new MotionMagicVelocityTorqueCurrentFOC(0, 0, false, 0, 0, false, false, false);
         this.motor.setControl(motorControl);
         this.noteSensor = new BinarySensor(Constants.Swerve.Carriage.carriageSensorPort);
         neutralModeChooser.setDefaultOption("Brake", NeutralModeValue.Brake);
@@ -83,11 +89,11 @@ public class Carriage extends SubsystemBase {
     }
 
     public void intake() {
-        if (!hasNote) {
-            velocity = Constants.Swerve.Carriage.intakeVelocity;
-        } else {
+        // if (!hasNote) {
+        velocity = Constants.Swerve.Carriage.intakeVelocity;
+        // } else {
 
-        }
+        // }
 
     }
 
@@ -133,8 +139,9 @@ public class Carriage extends SubsystemBase {
 
     @Override
     public void periodic() {
-        motorControl = new MotionMagicVelocityTorqueCurrentFOC(velocity, 0.0, true, feedforward.calculate(velocity), 0,
+        motorControl = new MotionMagicVelocityTorqueCurrentFOC(velocity, 0.0, false, feedforward.calculate(velocity), 0,
                 false, false, false);
+        motor.setControl(motorControl);
         motor.set(velocity);
 
         if (noteSensor.justEnabled()) {

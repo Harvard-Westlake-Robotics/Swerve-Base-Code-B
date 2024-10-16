@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -15,7 +16,7 @@ public class Intake extends SubsystemBase {
     private TalonFX intakeMotor;
     private double velocity = 0.0;
     private final SimpleMotorFeedforward feedForward;
-    private int intakeSpeed = 10;
+    private int intakeSpeed = 100;
     private int outtakeSpeed = -10;
     private MotionMagicVelocityTorqueCurrentFOC intakeControl;
 
@@ -42,7 +43,7 @@ public class Intake extends SubsystemBase {
         this.feedForward = new SimpleMotorFeedforward(Constants.Swerve.Intake.kS, Constants.Swerve.Intake.kV,
                 Constants.Swerve.Intake.kA);
         this.intakeMotor.setNeutralMode(Constants.Swerve.Intake.intakeNeutralMode);
-        this.intakeControl = new MotionMagicVelocityTorqueCurrentFOC(0, 0, true, 0, 0, false, false, false);
+        this.intakeControl = new MotionMagicVelocityTorqueCurrentFOC(0, 0, false, 0, 0, false, false, false);
         this.intakeMotor.setControl(intakeControl);
 
     }
@@ -65,7 +66,7 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        intakeControl = new MotionMagicVelocityTorqueCurrentFOC(velocity, 0.0, true,
+        intakeControl = new MotionMagicVelocityTorqueCurrentFOC(velocity, 0.0, false,
                 feedForward.calculate(velocity), 0, false, true, false);
         this.intakeMotor.setControl(intakeControl);
         this.intakeMotor.set(velocity);
