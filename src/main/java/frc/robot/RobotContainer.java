@@ -129,6 +129,8 @@ public class RobotContainer {
         shootFar.whileTrue(new ShooterPresetCommand(8));
         shootVeryFar.whileTrue(new ShooterPresetCommand(6.3));
 
+        // isDrifting.onTrue(new InstantCommand((() -> s_Swerve.isDrifting =
+        // !s_Swerve.isDrifting)));
     }
 
     public static boolean getIsRed() {
