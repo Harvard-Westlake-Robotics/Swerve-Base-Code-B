@@ -84,8 +84,49 @@ public class Carriage extends SubsystemBase {
         return motor.getVelocity().getValueAsDouble();
     }
 
+    public void secureNote(double originalPosition) {
+        Command secureCommand = new Command() {
+            @Override
+            public void initialize() {
+
+            }
+
+            double accumulatedPosition = 0.0;
+
+            @Override
+            public void execute() {
+                setVelocity(Constants.Swerve.Carriage.outtakeVelocity / 2);
+                Intake.getInstance().setVelocity(Constants.Swerve.Carriage.outtakeVelocity / 2);
+                accumulatedPosition -= getVelocity() * 0.02;
+                if (originalPosition - accumulatedPosition <= 0) {
+                    cancel();
+                }
+            }
+
+            @Override
+            public boolean isFinished() {
+                if (originalPosition - accumulatedPosition <= 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                Intake.getInstance().stop();
+                stop();
+            }
+        }.withTimeout(0.5);
+        secureCommand.schedule();
+    }
+
     public void resetMotor() {
         motor.setPosition(0);
+    }
+
+    public double getEncoderValue() {
+        return motor.getPosition().getValueAsDouble();
     }
 
     public void intake() {
@@ -138,8 +179,9 @@ public class Carriage extends SubsystemBase {
     }
 
     @Override
+
     public void periodic() {
-        motorControl = new MotionMagicVelocityTorqueCurrentFOC(velocity, 0.0, false, feedforward.calculate(velocity), 0,
+        motorControl = new MotionMagicVelocityTorqueCurrentFOC(velocity, 0.0, true, feedforward.calculate(velocity), 0,
                 false, false, false);
         motor.setControl(motorControl);
         motor.set(velocity);

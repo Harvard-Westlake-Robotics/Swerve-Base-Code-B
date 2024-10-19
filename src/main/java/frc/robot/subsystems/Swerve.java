@@ -1,7 +1,9 @@
 package frc.robot.subsystems;
 
 import frc.robot.SwerveModule;
+import frc.robot.Util;
 import frc.robot.Constants;
+import frc.robot.PoseEstimator;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -17,6 +19,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,10 +30,21 @@ public class Swerve extends SubsystemBase {
     public SwerveModule[] mSwerveMods;
     private NeutralModeValue neutralMode = Constants.Swerve.driveNeutralMode;
     private SendableChooser<NeutralModeValue> neutralModeChooser = new SendableChooser<>();
-
+    // private PoseEstimator poseEstimator;
 
     public NeutralModeValue getNeutralMode() {
         return neutralMode;
+    }
+
+    public double distTo(Translation2d position) {
+        return getPose().getTranslation().getDistance(position);
+    }
+
+    public double getDistToSpeaker() {
+        if (Util.getAlliance() == Alliance.Red)
+            return distTo(Constants.Field.RED.Speaker);
+
+        return distTo(Constants.Field.BLUE.Speaker);
     }
 
     public void setNeutralMode(NeutralModeValue neutralMode) {
@@ -62,9 +76,11 @@ public class Swerve extends SubsystemBase {
         };
 
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions());
+        // poseEstimator = null;// PoseEstimator.getInstance();
 
         neutralModeChooser.setDefaultOption("Brake", NeutralModeValue.Brake);
         neutralModeChooser.addOption("Coast", NeutralModeValue.Coast);
+        setPose(new Pose2d(new Translation2d(6, 3), new Rotation2d()));
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -73,7 +89,7 @@ public class Swerve extends SubsystemBase {
                         translation.getX(),
                         translation.getY(),
                         rotation,
-                        getHeading())
+                        getGyroYaw())
                         : new ChassisSpeeds(
                                 translation.getX(),
                                 translation.getY(),

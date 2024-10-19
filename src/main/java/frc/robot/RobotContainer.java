@@ -25,15 +25,23 @@ import frc.robot.subsystems.*;
  */
 public class RobotContainer {
     /* Controllers */
+    private static final boolean isDrifting = false;
     private final PS4Controller driver = new PS4Controller(0);
+    private final PS4Controller operator = new PS4Controller(1);
     /* Driver8Buttons */
     private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton robotCentric = new JoystickButton(driver,
             XboxController.Button.kLeftBumper.value);
-    private final JoystickButton intakeButton = new JoystickButton(driver, PS4Controller.Button.kCircle.value);
-    private static final boolean isDrifting = false;
-    private final JoystickButton spinShooter = new JoystickButton(driver, PS4Controller.Button.kL2.value);
-    private final JoystickButton angleButton = new JoystickButton(driver, PS4Controller.Button.kL1.value);
+
+    private final JoystickButton intakeButton = new JoystickButton(driver, PS4Controller.Button.kL2.value);
+    private final JoystickButton shootClose = new JoystickButton(driver, PS4Controller.Button.kR1.value);
+    private final JoystickButton outTakeButton = new JoystickButton(driver, PS4Controller.Button.kL1.value);
+    private final JoystickButton forceFire = new JoystickButton(driver, PS4Controller.Button.kCross.value);
+    private final JoystickButton passButton = new JoystickButton(driver, PS4Controller.Button.kR2.value);
+    private final JoystickButton shootFar = new JoystickButton(operator, PS4Controller.Button.kR1.value);
+    private final JoystickButton shootVeryFar = new JoystickButton(operator, PS4Controller.Button.kL2.value);
+    private final JoystickButton highPass = new JoystickButton(operator, PS4Controller.Button.kL1.value);
+    private final JoystickButton forceFireOperator = new JoystickButton(operator, PS4Controller.Button.kCross.value);
 
     public static boolean isDrifting() {
         return isDrifting;
@@ -44,6 +52,7 @@ public class RobotContainer {
     private final Intake intake = Intake.getInstance();
     private final Carriage carriage = Carriage.getInstance();
     private final Shooter shooter = Shooter.getInstance();
+    // private final PoseEstimator poseEstimator = PoseEstimator.getInstance();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -83,11 +92,43 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
-        // isDrifting.onTrue(new InstantCommand((() -> s_Swerve.isDrifting =
-        // !s_Swerve.isDrifting)));
-        intakeButton.onTrue(new IntakeCommand().withTimeout(5));
-        spinShooter.onTrue(new InstantCommand(() -> shooter.toggleShooter()));
-        angleButton.onTrue(new ShooterPresetCommand());
+        intakeButton.whileTrue(new IntakeCommand()).onFalse(new InstantCommand(() -> {
+            Intake.getInstance().stop();
+            Carriage.getInstance().stop();
+        }));
+        outTakeButton.whileTrue(new OutTakeCommand());
+        shootClose.whileTrue(new ShooterPresetCommand(13));
+        forceFire.whileTrue(new InstantCommand(() -> {
+            Intake.getInstance().setIntakeSpeed(0.5);
+            Carriage.getInstance().setVelocity(1);
+        })).onFalse(new InstantCommand(() -> {
+            Intake.getInstance().stop();
+            Carriage.getInstance().stop();
+        }));
+        passButton.whileTrue(new InstantCommand(() -> {
+            Shooter.getInstance().setAngleTarget(4);
+            Shooter.getInstance().setVelocity(Constants.Swerve.Shooter.passVelocity);
+        })).onFalse(new InstantCommand(() -> {
+            Shooter.getInstance().setAngleTarget(1.5);
+            Shooter.getInstance().stop();
+        }));
+        highPass.whileTrue(new InstantCommand(() -> {
+            Shooter.getInstance().setAngleTarget(13);
+            Shooter.getInstance().setVelocity(0.6);
+        })).onFalse(new InstantCommand(() -> {
+            Shooter.getInstance().setAngleTarget(1.5);
+            Shooter.getInstance().stop();
+        }));
+        forceFireOperator.whileTrue(new InstantCommand(() -> {
+            Intake.getInstance().setIntakeSpeed(0.5);
+            Carriage.getInstance().setVelocity(1);
+        })).onFalse(new InstantCommand(() -> {
+            Intake.getInstance().stop();
+            Carriage.getInstance().stop();
+        }));
+        shootFar.whileTrue(new ShooterPresetCommand(8));
+        shootVeryFar.whileTrue(new ShooterPresetCommand(6.3));
+
     }
 
     public static boolean getIsRed() {

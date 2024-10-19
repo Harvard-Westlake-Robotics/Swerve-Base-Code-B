@@ -44,7 +44,7 @@ public class ShotCalculator {
         }
 
         // Calculate optimal angle
-        double optimalTheta = 0.9 * Math.atan2(dy, dx + Constants.Swerve.trackWidth/2) + (0.1/2*Math.PI)*dy;
+        double optimalTheta = 0.9 * Math.atan2(dy, dx + Constants.Swerve.trackWidth / 2) + (0.1 / 2 * Math.PI) * dy;
 
         // Ensure the angle is within physical constraints
         if (optimalTheta < THETA_MIN || optimalTheta > THETA_MAX) {
