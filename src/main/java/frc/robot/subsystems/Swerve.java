@@ -192,8 +192,12 @@ public class Swerve extends SubsystemBase {
         return sum / mSwerveMods.length;
     }
 
+    double distance = 0.0;
+
     @Override
     public void periodic() {
+        System.out.println(distance);
+        distance += getRobotVelocity().vyMetersPerSecond * 0.02;
         swerveOdometry.update(getGyroYaw(), getModulePositions());
 
         // Smart Dashboard numbers

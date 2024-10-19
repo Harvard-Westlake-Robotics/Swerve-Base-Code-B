@@ -39,7 +39,7 @@ public class RobotContainer {
     private final JoystickButton forceFire = new JoystickButton(driver, PS4Controller.Button.kCross.value);
     private final JoystickButton passButton = new JoystickButton(driver, PS4Controller.Button.kR2.value);
     private final JoystickButton shootFar = new JoystickButton(operator, PS4Controller.Button.kR1.value);
-    private final JoystickButton shootVeryFar = new JoystickButton(operator, PS4Controller.Button.kL2.value);
+    private final JoystickButton shootVeryFar = new JoystickButton(operator, PS4Controller.Button.kR2.value);
     private final JoystickButton highPass = new JoystickButton(operator, PS4Controller.Button.kL1.value);
     private final JoystickButton forceFireOperator = new JoystickButton(operator, PS4Controller.Button.kCross.value);
 
